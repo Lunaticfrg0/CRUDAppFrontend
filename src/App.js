@@ -1,14 +1,12 @@
-import logo from './logo.svg';
 import React, {useState, useEffect} from "react";
 import './App.css';
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Modal, ModalBody, ModalHeader, ModalFooter, Form } from "reactstrap";
+import { Modal, ModalBody, ModalHeader, 
+          ModalFooter } from "reactstrap";
 import { GetAllUsers, 
-        GetSingleUser, 
         DeleteUser, 
         UpdateUser, 
         CreateUser} from "./util/APIFunctions"
-
 
 function App() {
   const [usersData, setUsersData] = useState([]);
@@ -21,12 +19,16 @@ function App() {
     name: ""
   })
 
+  const updateUserList = () => {
+    GetAllUsers().then((users) => {
+      setUsersData(users);
+    });
+  }
+
   useEffect(() => {
     let mounted = true;
     if (mounted) {
-      GetAllUsers().then((users) => {
-        setUsersData(users);
-      });
+     updateUserList()
     }
     return () => (mounted = false);
   }, []);
@@ -49,20 +51,15 @@ function App() {
   }
 
   const updateUser = () => {
-    let newUser = usersData;
-    newUser.map(user => {
-      if(user.id === userSelected.id){
-        user.name = userSelected.name;
-      }
-    })
-    setUsersData(newUser)
-    setUpdateModal(false)
+    UpdateUser(userSelected.id, userSelected.name).then((users) => {
+      setUpdateModal(false)
+    }).then(updateUserList);
   }
 
   const deleteUser = () => {
-    setUsersData(usersData.filter(user => user.id !== userSelected.id))
-    setDeleteModal(false)
-    console.log(usersData)
+    DeleteUser(userSelected.id).then((users) => {
+      setDeleteModal(false)
+    }).then(updateUserList);
   }
   
   const openCreateModal = () => {
@@ -72,9 +69,30 @@ function App() {
 
   const createUser = () => {
     CreateUser(userSelected.name).then((user) => {
-      setUsersData.push(user);
-    });
+    }).then(updateUserList);
     setCreateModal(false) 
+  }
+
+  const contentHandler = () => {
+    if(!usersData[0]){
+      return <h1>No Users</h1>
+    }
+    else {
+      return usersData.map(user => (
+        <tr>
+          <td>{user.id}</td>
+          <td>{user.name}</td>
+          <td><button className="btn btn-primary" 
+                      onClick = {()=>selectUser(user, "update")}>
+                      Update
+              </button> {" "}
+              <button className="btn btn-danger"
+                      onClick={()=> selectUser(user, "delete")}
+              >Delete</button>
+          </td>
+        </tr>
+      ))
+    }
   }
 
   return (
@@ -94,20 +112,7 @@ function App() {
         </tr>
       </thead>
       <tbody>
-        {usersData.map(user => (
-          <tr>
-            <td>{user.id}</td>
-            <td>{user.name}</td>
-            <td><button className="btn btn-primary" 
-                        onClick = {()=>selectUser(user, "update")}>
-                        Update
-                </button> {" "}
-                <button className="btn btn-danger"
-                        onClick={()=> selectUser(user, "delete")}
-                >Delete</button>
-            </td>
-          </tr>
-        ))}
+      {contentHandler()}
       </tbody>
     </table>
     <Modal isOpen={udpdateModal}>
@@ -181,7 +186,7 @@ function App() {
           Create
         </button>
         <button className= "btn btn-danger"
-                nClick={()=> setCreateModal(false)}>
+                onClick={()=> setCreateModal(false)}>
           Cancel
         </button>
       </ModalFooter>
