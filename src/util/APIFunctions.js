@@ -9,13 +9,10 @@ export async function GetAllUsers() {
                 'http://localhost:4019/api/users'
             );
             data = response.data
-            console.log(data)
     } catch(error){
-        console.log("error")
     }
     return data
 }
-//TO-DO: testing pending
 export async function GetSingleUser(ID) {
 
     let data = {}
@@ -25,13 +22,11 @@ export async function GetSingleUser(ID) {
                 `http://localhost:4019/api/users/${ID}`
             );
             data = response.data
-            console.log(data)
     } catch(error){
         console.log("error")
     }
     return data
 }
-//TO-DO: testing pending
 export async function DeleteUser(ID) {
 
     let data = {}
@@ -41,14 +36,11 @@ export async function DeleteUser(ID) {
                 `http://localhost:4019/api/users/${ID}`
             );
             data = response.data
-            console.log(data)
-
     } catch(error){
         console.log("error")
     }
     return data
 }
-//TO-DO: testing pending
 export async function UpdateUser(ID, name) {
 
     let data = {}
@@ -60,8 +52,6 @@ export async function UpdateUser(ID, name) {
                 }
             );
             data = response.data
-            console.log(data)
-
     } catch(error){
         console.log("error")
     }
@@ -78,7 +68,6 @@ export async function CreateUser(name) {
                 }
             );
             data = response.data
-            console.log(data)
     } catch(error){
         console.log("error")
     }
