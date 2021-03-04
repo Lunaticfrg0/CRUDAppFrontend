@@ -1,16 +1,17 @@
 import logo from './logo.svg';
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import './App.css';
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Modal, ModalBody, ModalHeader, ModalFooter } from "reactstrap";
+import { Modal, ModalBody, ModalHeader, ModalFooter, Form } from "reactstrap";
+import { GetAllUsers, 
+        GetSingleUser, 
+        DeleteUser, 
+        UpdateUser, 
+        CreateUser} from "./util/APIFunctions"
 
-const users = [
-  {id: 1, name: "Emilio Escano"},
-  {id: 2, name: "Lia"}
-]
 
 function App() {
-  const [usersData, setUsersData] = useState(users);
+  const [usersData, setUsersData] = useState([]);
   const [udpdateModal, setUpdateModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [createModal, setCreateModal] = useState(false);
@@ -19,6 +20,16 @@ function App() {
     id: "", 
     name: ""
   })
+
+  useEffect(() => {
+    let mounted = true;
+    if (mounted) {
+      GetAllUsers().then((users) => {
+        setUsersData(users);
+      });
+    }
+    return () => (mounted = false);
+  }, []);
 
   const selectUser = (user, action) => {
     setUserSelected(user);
@@ -60,11 +71,9 @@ function App() {
   }
 
   const createUser = () => {
-    let newUser = userSelected;
-    newUser.id = users.length+1
-    let newUsers = users
-    newUsers.push(newUser)
-    setUsersData(newUsers)
+    CreateUser(userSelected.name).then((user) => {
+      setUsersData.push(user);
+    });
     setCreateModal(false) 
   }
 
